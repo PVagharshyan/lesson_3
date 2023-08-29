@@ -13,7 +13,6 @@ public:
     int length() const;
     String operator+(const String&) const;
     String& operator=(const String&);
-    String& operator=(String&&);
     String& operator+=(const String&);
     bool operator==(const String&) const;
     ~String();
@@ -33,7 +32,6 @@ private:
             capacity = obj.capacity;
             ptr = obj.ptr;
             obj.ptr = nullptr;
-            return *this;
         }
     };
     storage_type m_storage;

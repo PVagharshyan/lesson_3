@@ -1,6 +1,8 @@
-#include <iostream>
 #include "string.h"
+
+#include <iostream>
 #include <cstring>
+#include <istream>
 #include <ostream>
 #include <type_traits>
 
@@ -41,8 +43,21 @@ String::String(const String& str) {
     }
     else {
         m_storage = storage_type::STATIC;
-        for (int i = 0; i < str.m_string.str.size; ++i) {
-            m_string.onstack[i] = str.m_string.str.ptr[i];
+        for (int i = 0; i < SIZE; ++i) {
+            m_string.onstack[i] = str.m_string.onstack[i];
+        }
+    }
+}
+
+String::String(String&& str) {
+    if (str.m_storage == storage_type::DYNAMIC) {
+         m_storage = std::move(str.m_storage);
+         m_string.str = std::move(str.m_string.str);
+    }
+    else {
+        m_storage = std::move(str.m_storage);
+        for (int i = 0; i < SIZE; ++i) {
+            m_string.onstack[i] = std::move(str.m_string.onstack[i]);
         }
     }
 }
@@ -95,6 +110,9 @@ String String::operator+(const String& str) const {
 }
 
 String& String::operator=(const String& str) {
+    if (str == *this) {
+        return *this;
+    }
     if (m_storage == storage_type::DYNAMIC) {
         delete[] m_string.str.ptr;
     } 
@@ -110,8 +128,28 @@ String& String::operator=(const String& str) {
     }
     else {
         m_storage = storage_type::STATIC;
-        for (int i = 0; i < str.m_string.str.size; ++i) {
-            m_string.onstack[i] = str.m_string.str.ptr[i];
+        for (int i = 0; i < SIZE; ++i) {
+            m_string.onstack[i] = str.m_string.onstack[i];
+        }
+    }
+    return *this;
+}
+
+String& String::operator=(String&& str) {
+    if (str == *this) {
+        return *this;
+    }
+    if (m_storage == storage_type::DYNAMIC) {
+        delete[] m_string.str.ptr;
+    } 
+    if (str.m_storage == storage_type::DYNAMIC) {
+         m_storage = std::move(str.m_storage);
+         m_string.str = std::move(str.m_string.str);
+    }
+    else {
+        m_storage = std::move(str.m_storage);
+        for (int i = 0; i < SIZE; ++i) {
+            m_string.onstack[i] = std::move(str.m_string.onstack[i]);
         }
     }
     return *this;
